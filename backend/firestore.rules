@@ -1,42 +1,48 @@
+// Reglas Firestore adaptadas a tus artículos
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function validArticle() {
       return request.resource.data.keys().hasOnly([
+        'id',
+        'author',
         'title',
-        'subtitle',
-        'content',
-        'imageUrl',
-        'createdAt',
-        'updatedAt'
+        'description',
+        'url',
+        'urlToImage',
+        'publishedAt',
+        'content'
       ])
+      &&
+      request.resource.data.id is string
+      &&
+      request.resource.data.author is string
       &&
       request.resource.data.title is string
         && request.resource.data.title.size() >= 3
       &&
+      request.resource.data.description is string
+      &&
+      request.resource.data.url is string
+      &&
+      request.resource.data.urlToImage is string
+      &&
+      request.resource.data.publishedAt is string
+      &&
       request.resource.data.content is string
-        && request.resource.data.content.size() >= 20
-      &&
-      (
-        !('imageUrl' in request.resource.data)
-        || request.resource.data.imageUrl is string
-      )
-      &&
-      request.resource.data.createdAt is timestamp
-      &&
-      request.resource.data.updatedAt is timestamp;
+        && request.resource.data.content.size() >= 20;
     }
 
     match /articles/{id} {
 
-      // Lectura pública
+      // Lectura sin restricciones
       allow read: if true;
 
-      // Escritura solo si el documento es válido (para la prueba no usamos auth)
+      // Escritura solo si el documento es válido
       allow create, update: if validArticle();
 
-      // Opcional: permitir borrar solo si el doc existe
+      // Permitir borrar artículos
       allow delete: if true;
     }
   }

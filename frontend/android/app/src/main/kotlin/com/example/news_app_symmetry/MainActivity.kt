@@ -1,4 +1,4 @@
-package com.example.frontend
+package com.example.news_app_symmetry
 
 import io.flutter.embedding.android.FlutterActivity
 

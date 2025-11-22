@@ -1,39 +1,42 @@
-import 'package:floor/floor.dart';
-import 'package:news_app_symmetry/features/daily_news/domain/entities/article.dart';
-import '../../../../core/constants/constants.dart';
+import '../../domain/entities/article.dart';
 
-@Entity(tableName: 'article',primaryKeys: ['id'])
 class ArticleModel extends ArticleEntity {
   const ArticleModel({
-    int ? id,
-    String ? author,
-    String ? title,
-    String ? description,
-    String ? url,
-    String ? urlToImage,
-    String ? publishedAt,
-    String ? content,
-  }): super(
-    id: id,
-    author: author,
-    title: title,
-    description: description,
-    url: url,
-    urlToImage: urlToImage,
-    publishedAt: publishedAt,
-    content: content,
-  );
+    required super.id,
+    required super.author,
+    required super.title,
+    required super.description,
+    required super.url,
+    required super.urlToImage,
+    required super.publishedAt,
+    required super.content,
+  });
 
-  factory ArticleModel.fromJson(Map < String, dynamic > map) {
+  factory ArticleModel.fromJson(Map<String, dynamic> json) {
     return ArticleModel(
-      author: map['author'] ?? "",
-      title: map['title'] ?? "",
-      description: map['description'] ?? "",
-      url: map['url'] ?? "",
-      urlToImage: map['urlToImage'] != null && map['urlToImage'] != "" ? map['urlToImage'] : kDefaultImage,
-      publishedAt: map['publishedAt'] ?? "",
-      content: map['content'] ?? "",
+      id: json["id"] ?? "",
+      author: json["author"] ?? "",
+      title: json["title"] ?? "",
+      description: json["description"] ?? "",
+      url: json["url"] ?? "",
+      urlToImage: json["urlToImage"] ?? "",
+      publishedAt: json["publishedAt"] ?? "",
+      content: json["content"] ?? "",
     );
+  }
+
+  // añadimos para usar firestore
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "author": author,
+      "title": title,
+      "description": description,
+      "url": url,
+      "urlToImage": urlToImage,
+      "publishedAt": publishedAt,
+      "content": content,
+    };
   }
 
   factory ArticleModel.fromEntity(ArticleEntity entity) {
@@ -45,7 +48,7 @@ class ArticleModel extends ArticleEntity {
       url: entity.url,
       urlToImage: entity.urlToImage,
       publishedAt: entity.publishedAt,
-      content: entity.content
+      content: entity.content,
     );
   }
 }
