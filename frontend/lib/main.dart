@@ -23,7 +23,6 @@ Future<void> main() async {
   // solo debug
   final snapshot = await FirebaseFirestore.instance.collection('articles').get();
   print("ARTICLES COUNT: ${snapshot.docs.length}");
-  print("FIRESTORE HOST: ${FirebaseFirestore.instance.settings.host}");
 
   runApp(const MyApp());
 }
@@ -37,8 +36,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: theme(),
       onGenerateRoute: AppRoutes.onGenerateRoutes,
-
-      // 👇 ESTA ES LA DIFERENCIA CRÍTICA
       home: BlocProvider<RemoteArticlesBloc>(
         create: (context) =>
             sl<RemoteArticlesBloc>()..add(const GetArticles()),

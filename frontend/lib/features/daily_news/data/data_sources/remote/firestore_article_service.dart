@@ -21,7 +21,7 @@ class FirestoreArticleService {
     await doc.set(article.toJson());
   }
 
-  Future<void> removeArticle(String id) async {
+  Future<void> removeArticle( id) async {
     await _articlesRef.doc(id).delete();
   }
 }
