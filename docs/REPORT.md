@@ -30,7 +30,7 @@ Here you would be able to see how my projects looks.
 ![Create Article Dark](./media/screenshots/create_article_dark.jpg)
 ![Saved Articles Light](./media/screenshots/saved_articles_light.jpg)
 ![Saved Articles Dark](./media/screenshots/saved_articles_dark.jpg)
-![Video Demo](./assets/videos/demo.mp4)
+![Video Demo](./media/videos/demo.mp4)
 
 ### Notes  
 - All screenshots were taken from the final working build.  
@@ -63,9 +63,9 @@ These screens were entirely optional, but they helped me showcase my strengths i
 Before coding the new screens, I created a layout in Figma to plan the interface visually.
 Due to time constraints, I could not complete a full high-fidelity interactive prototype, but the design mockup is clear and easy to extend in the future.
 
-![Figma Design](./media/screenshots/figma_sketches.jpg)
+![Figma Design](./media/screenshots/figma-sketches.jpg)
 and the icons:
-![Figma Design](./media/screenshots/figma_icons.jpg)
+![Figma Design](./media/screenshots/figma-icons.jpg)
 
 
 ### 6.3 How Can I Improve This
