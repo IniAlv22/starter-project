@@ -5,6 +5,8 @@ import 'firebase_options.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_symmetry/config/routes/routes.dart';
 
+import 'package:news_app_symmetry/features/daily_news/presentation/bloc/article/create/create_article_bloc.dart';
+
 import 'package:news_app_symmetry/features/daily_news/presentation/bloc/article/remote/remote_article_event.dart';
 import 'package:news_app_symmetry/features/daily_news/presentation/pages/home/daily_news.dart';
 import 'features/daily_news/presentation/bloc/article/local/local_article_bloc.dart';
@@ -45,6 +47,9 @@ Future<void> main() async {
         /// LOCAL ARTICLES → guardar / eliminar favoritos
         BlocProvider<LocalArticleBloc>(
           create: (_) => sl<LocalArticleBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => sl<CreateArticleBloc>(),
         ),
       ],
       child: const MyApp(),
