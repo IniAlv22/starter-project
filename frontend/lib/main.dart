@@ -4,9 +4,14 @@ import 'firebase_options.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_symmetry/config/routes/routes.dart';
+
 import 'package:news_app_symmetry/features/daily_news/presentation/bloc/article/remote/remote_article_event.dart';
 import 'package:news_app_symmetry/features/daily_news/presentation/pages/home/daily_news.dart';
+import 'features/daily_news/presentation/bloc/article/local/local_article_bloc.dart';
+
 import 'config/theme/app_themes.dart';
+import 'config/theme/theme_cubit.dart';
+
 import 'features/daily_news/presentation/bloc/article/remote/remote_article_bloc.dart';
 import 'injection_container.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,7 +29,27 @@ Future<void> main() async {
   final snapshot = await FirebaseFirestore.instance.collection('articles').get();
   print("ARTICLES COUNT: ${snapshot.docs.length}");
 
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        /// THEME CUBIT → controla modo oscuro
+        BlocProvider<ThemeCubit>(
+          create: (_) => ThemeCubit(),
+        ),
+
+        /// REMOTE ARTICLES BLOC → para cargar noticias
+        BlocProvider<RemoteArticlesBloc>(
+          create: (context) =>
+              sl<RemoteArticlesBloc>()..add(const GetArticles()),
+        ),
+        /// LOCAL ARTICLES → guardar / eliminar favoritos
+        BlocProvider<LocalArticleBloc>(
+          create: (_) => sl<LocalArticleBloc>(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -32,15 +57,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: theme(),
-      onGenerateRoute: AppRoutes.onGenerateRoutes,
-      home: BlocProvider<RemoteArticlesBloc>(
-        create: (context) =>
-            sl<RemoteArticlesBloc>()..add(const GetArticles()),
-        child: const DailyNews(),
-      ),
+    return BlocBuilder<ThemeCubit, bool>(
+      builder: (context, isDarkMode) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+
+          onGenerateRoute: AppRoutes.onGenerateRoutes,
+
+          home: const DailyNews(),
+        );
+      },
     );
   }
 }
