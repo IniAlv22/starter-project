@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../features/daily_news/domain/entities/article.dart';
 import '../../features/daily_news/presentation/pages/article_detail/article_detail.dart';
 import '../../features/daily_news/presentation/pages/home/daily_news.dart';
-import '../../features/daily_news/presentation/pages/saved_article/saved_article.dart';
+import '../../features/daily_news/presentation/pages/saved_article/saved_articles.dart';
+import 'package:news_app_symmetry/features/daily_news/presentation/pages/add_article/add_article.dart';
 
 
 class AppRoutes {
@@ -14,6 +15,9 @@ class AppRoutes {
 
       case '/ArticleDetails':
         return _materialRoute(ArticleDetailsView(article: settings.arguments as ArticleEntity));
+
+      case '/AddArticle':
+        return _materialRoute(const AddArticle());
 
       case '/SavedArticles':
         return _materialRoute(const SavedArticles());

@@ -15,17 +15,14 @@ class RemoteArticlesBloc
 
   void onGetArticles(
       GetArticles event, Emitter<RemoteArticlesState> emit) async {
-    print("🔥 RemoteArticlesBloc: GetArticles RECIBIDO");
     final dataState = await _getArticleUseCase();
 
     if (dataState is DataSuccess) {
-      print("🔥 RemoteArticlesBloc: artículos -> ${dataState.data!.length}");
       emit(RemoteArticlesDone(dataState.data ?? []));
       return;
     }
 
     if (dataState is DataFailed) {
-      print("❌ RemoteArticlesBloc: error -> ${dataState.error}");
       emit(RemoteArticlesError(dataState.error!));
     }
   }

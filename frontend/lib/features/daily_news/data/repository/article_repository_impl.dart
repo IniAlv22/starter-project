@@ -5,6 +5,7 @@ import 'package:news_app_symmetry/features/daily_news/data/data_sources/remote/f
 import 'package:news_app_symmetry/features/daily_news/data/models/article.dart';
 import 'package:news_app_symmetry/features/daily_news/domain/entities/article.dart';
 import 'package:news_app_symmetry/features/daily_news/domain/repository/article_repository.dart';
+import 'package:news_app_symmetry/features/daily_news/domain/usecases/params/create_article_params.dart';
 
 class ArticleRepositoryImpl implements ArticleRepository {
   final FirestoreArticleService _remoteDataSource;
@@ -15,13 +16,11 @@ class ArticleRepositoryImpl implements ArticleRepository {
     this._localDataSource,
   );
 
-  // 🔥 FIRESTORE — get remote articles
+  // FIRESTORE — get remote articles
   @override
   Future<DataState<List<ArticleModel>>> getNewsArticles() async {
     try {
       final articles = await _remoteDataSource.getArticles();
-
-      // Muy importante: asegurar siempre un DataSuccess correcto
       return DataSuccess<List<ArticleModel>>(articles);
 
     } catch (e) {
@@ -54,4 +53,23 @@ class ArticleRepositoryImpl implements ArticleRepository {
     return _localDataSource.articleDAO
         .insertArticle(ArticleModel.fromEntity(article));
   }
+
+  // 🔴 CREATE ARTICLE — Firestore
+@override
+Future<DataState<void>> createArticle(CreateArticleParams params) async {
+  try {
+    await _remoteDataSource.createArticle(params);
+    return DataSuccess(null);
+
+  } catch (e) {
+    return DataFailed(
+      DioException(
+        requestOptions: RequestOptions(path: ''),
+        error: e,
+        type: DioExceptionType.unknown,
+      ),
+    );
+  }
+}
+
 }

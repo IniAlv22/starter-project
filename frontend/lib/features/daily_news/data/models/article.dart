@@ -1,8 +1,14 @@
+import 'package:floor/floor.dart';
 import '../../domain/entities/article.dart';
 
+@Entity(tableName: "article")
 class ArticleModel extends ArticleEntity {
+
+  @primaryKey
+  final int? id;
+
   const ArticleModel({
-    required super.id,
+    required this.id,
     required super.author,
     required super.title,
     required super.description,
@@ -14,41 +20,38 @@ class ArticleModel extends ArticleEntity {
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     return ArticleModel(
-      id: json["id"] ?? "",
-      author: json["author"] ?? "",
-      title: json["title"] ?? "",
-      description: json["description"] ?? "",
-      url: json["url"] ?? "",
-      urlToImage: json["urlToImage"] ?? "",
-      publishedAt: json["publishedAt"] ?? "",
-      content: json["content"] ?? "",
+      id: json["id"],
+      author: json["author"],
+      title: json["title"],
+      description: json["description"],
+      url: json["url"],
+      urlToImage: json["urlToImage"],
+      publishedAt: json["publishedAt"],
+      content: json["content"],
     );
   }
 
-  // añadimos para usar firestore
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "author": author,
-      "title": title,
-      "description": description,
-      "url": url,
-      "urlToImage": urlToImage,
-      "publishedAt": publishedAt,
-      "content": content,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "author": author,
+        "title": title,
+        "description": description,
+        "url": url,
+        "urlToImage": urlToImage,
+        "publishedAt": publishedAt,
+        "content": content,
+      };
 
-  factory ArticleModel.fromEntity(ArticleEntity entity) {
+  factory ArticleModel.fromEntity(ArticleEntity e) {
     return ArticleModel(
-      id: entity.id,
-      author: entity.author,
-      title: entity.title,
-      description: entity.description,
-      url: entity.url,
-      urlToImage: entity.urlToImage,
-      publishedAt: entity.publishedAt,
-      content: entity.content,
+      id: e.id,
+      author: e.author,
+      title: e.title,
+      description: e.description,
+      url: e.url,
+      urlToImage: e.urlToImage,
+      publishedAt: e.publishedAt,
+      content: e.content,
     );
   }
 }
