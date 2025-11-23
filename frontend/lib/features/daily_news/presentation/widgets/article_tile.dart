@@ -1,162 +1,156 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ionicons/ionicons.dart';
+
 import '../../domain/entities/article.dart';
+import '../bloc/article/local/local_article_bloc.dart';
+import '../bloc/article/local/local_article_event.dart';
 
 class ArticleWidget extends StatelessWidget {
   final ArticleEntity? article;
-  final bool? isRemovable;
+  final bool isRemovable;
   final void Function(ArticleEntity article)? onRemove;
   final void Function(ArticleEntity article)? onArticlePressed;
 
   const ArticleWidget({
-    Key? key,
-    this.article,
+    super.key,
+    required this.article,
     this.onArticlePressed,
     this.isRemovable = false,
     this.onRemove,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    return _buildCardStructure(context);
+  }
+
+  Widget _buildCardStructure(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _onTap,
+      onTap: () => onArticlePressed?.call(article!),
       child: Container(
-        padding: const EdgeInsetsDirectional.only(
-            start: 14, end: 14, bottom: 7, top: 7),
-        height: MediaQuery.of(context).size.width / 2.2,
-        child: Row(
+        margin: const EdgeInsets.only(bottom: 16, left: 20, right: 20),
+        height: 230,
+        decoration: _buildBackgroundImage(),
+        child: Stack(
           children: [
-            _buildImage(context),
-            _buildTitleAndDescription(),
-            _buildRemovableArea(),
+            _buildOverlay(),
+            _buildActionButton(context),
+            _buildContent(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildImage(BuildContext context) {
-    return CachedNetworkImage(
-        imageUrl: article!.urlToImage!,
-        imageBuilder: (context, imageProvider) => Padding(
-              padding: const EdgeInsetsDirectional.only(end: 14),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 3,
-                  height: double.maxFinite,
-                  decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.08),
-                      image: DecorationImage(
-                          image: imageProvider, fit: BoxFit.cover)),
-                ),
-              ),
-            ),
-        progressIndicatorBuilder: (context, url, downloadProgress) => Padding(
-              padding: const EdgeInsetsDirectional.only(end: 14),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 3,
-                  height: double.maxFinite,
-                  child: CupertinoActivityIndicator(),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.08),
-                  ),
-                ),
-              ),
-            ),
-        errorWidget: (context, url, error) => Padding(
-              padding: const EdgeInsetsDirectional.only(end: 14),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 3,
-                  height: double.maxFinite,
-                  child: Icon(Icons.error),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.08),
-                  ),
-                ),
-              ),
-            ));
+  BoxDecoration _buildBackgroundImage() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(22),
+      image: DecorationImage(
+        image: CachedNetworkImageProvider(article!.urlToImage!),
+        fit: BoxFit.cover,
+      ),
+    );
   }
 
-  Widget _buildTitleAndDescription() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 7),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title
-            Text(
-              article!.title ?? '',
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontFamily: 'Butler',
-                fontWeight: FontWeight.w900,
-                fontSize: 18,
-                color: Colors.black87,
-              ),
-            ),
+  Widget _buildOverlay() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        color: Colors.black.withOpacity(0.65),
+      ),
+    );
+  }
 
-            // Description
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  article!.description ?? '',
-                  maxLines: 2,
-                ),
-              ),
-            ),
-
-            // Datetime
-            Row(
-              children: [
-                const Icon(Icons.timeline_outlined, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  article!.publishedAt!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
+  Widget _buildActionButton(BuildContext context) {
+    return Positioned(
+      top: 14,
+      right: 14,
+      child: GestureDetector(
+        onTap: () => _handleActionPressed(context),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isRemovable
+                ? Colors.red
+                : const Color.fromARGB(255, 58, 110, 255),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            isRemovable ? Ionicons.trash_outline : Ionicons.bookmark_outline,
+            color: Colors.white,
+            size: 18,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildRemovableArea() {
-    if (isRemovable!) {
-      return GestureDetector(
-        onTap: _onRemove,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Icon(Icons.remove_circle_outline, color: Colors.red),
+  void _handleActionPressed(BuildContext context) {
+    if (isRemovable) {
+      onRemove?.call(article!);
+    } else {
+      BlocProvider.of<LocalArticleBloc>(context).add(SaveArticle(article!));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.black,
+          content: Text('Article saved successfully.'),
         ),
       );
     }
-    return Container();
   }
 
-  void _onTap() {
-    if (onArticlePressed != null) {
-      onArticlePressed!(article!);
-    }
+  Widget _buildContent() {
+    return Positioned(
+      left: 16,
+      right: 16,
+      bottom: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTitle(),
+          const SizedBox(height: 12),
+          _buildAuthorAndDate(),
+        ],
+      ),
+    );
   }
 
-  void _onRemove() {
-    if (onRemove != null) {
-      onRemove!(article!);
-    }
+  Widget _buildTitle() {
+    return Text(
+      article!.title ?? "",
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(
+        fontFamily: 'Muli',
+        color: Colors.white,
+        fontWeight: FontWeight.w700,
+        fontSize: 20,
+      ),
+    );
+  }
+
+  Widget _buildAuthorAndDate() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "Autor ${article!.author ?? 'Unknown'}",
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+          ),
+        ),
+        Text(
+          article!.publishedAt ?? "",
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+          ),
+        ),
+      ],
+    );
   }
 }

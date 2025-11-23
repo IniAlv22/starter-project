@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app_clean_architecture/features/daily_news/presentation/bloc/article/local/local_article_event.dart';
-import 'package:news_app_clean_architecture/features/daily_news/presentation/bloc/article/local/local_article_state.dart';
+import 'package:news_app_symmetry/features/daily_news/presentation/bloc/article/local/local_article_event.dart';
+import 'package:news_app_symmetry/features/daily_news/presentation/bloc/article/local/local_article_state.dart';
 
 import '../../../../domain/usecases/get_saved_article.dart';
 import '../../../../domain/usecases/remove_article.dart';
@@ -22,11 +22,20 @@ class LocalArticleBloc extends Bloc<LocalArticlesEvent,LocalArticlesState> {
   }
 
 
-  void onGetSavedArticles(GetSavedArticles event,Emitter<LocalArticlesState> emit) async {
+  void onGetSavedArticles(
+  GetSavedArticles event,
+  Emitter<LocalArticlesState> emit,
+) async {
+  emit(const LocalArticlesLoading());
+
+  try {
     final articles = await _getSavedArticleUseCase();
     emit(LocalArticlesDone(articles));
+  } catch (e) {
+    print("ERROR al obtener saved articles: $e");
+    emit(const LocalArticlesDone([])); // evita quedarse en loading
   }
-  
+} 
   void onRemoveArticle(RemoveArticle removeArticle,Emitter<LocalArticlesState> emit) async {
     await _removeArticleUseCase(params: removeArticle.article);
     final articles = await _getSavedArticleUseCase();
